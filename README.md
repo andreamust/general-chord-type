@@ -17,6 +17,11 @@ The code in this repository is in no way connected to the authors of the paper, 
 is to be intended as an interpretation based on the pseudocode and description provided in the bibliographical 
 references provided.
 
+### Novelty
+In addition to the approach proposed by the paper cited above, in this repository you can find code that allows you to 
+convert annotated chords in [Harte](https://ismir2005.ismir.net/proceedings/1080.pdf) format directly into the format 
+proposed by the paper.
+
 ## Usage
 
 TBD
