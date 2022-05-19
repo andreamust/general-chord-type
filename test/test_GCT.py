@@ -25,10 +25,15 @@ def test_chords_stats(file_path: str):
     """
     chord_data = open_stats_file(file_path)
 
+    classes = []
     for data in chord_data:
         if 'chord' in data[3]:
             print(data[1])
-            print(harte_to_gct(data[1]))
+            gct_chord = harte_to_gct(data[1])
+            classes.append(gct_chord)
+            print(f'{data[0]} ---> {gct_chord}')
+    print(f'\nOriginal classes: {len(chord_data)}')
+    print(f'\nTotal classes: {len(set([tuple((e, tuple(l))) for e, l in classes]))}')
 
 
 if __name__ == '__main__':

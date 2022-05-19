@@ -50,12 +50,13 @@ def clean_asterisks(chord_grades: list) -> list:
     :param chord_grades:
     :return:
     """
-    ask_list = [i for i, x in enumerate(chord_grades) if '*' in x]
+    ask_list = sorted(i for i, x in enumerate(chord_grades) if '*' in x)[::-1]
     if len(ask_list) > 0:
         removed_grades = [chord_grades.pop(k) for k in ask_list]
         for grade in removed_grades:
             grade_to_remove = ''.join([el for el in grade if el.isdigit()])
-            chord_grades.remove(grade_to_remove)
+            if grade_to_remove in chord_grades:
+                chord_grades.remove(grade_to_remove)
     return chord_grades
 
 

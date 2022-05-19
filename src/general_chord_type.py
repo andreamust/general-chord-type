@@ -8,7 +8,7 @@ sys.path.append(os.path.dirname(os.getcwd()))
 harte_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'harte'))
 sys.path.append(harte_path)
 
-from utils import get_minimum
+from utils import get_minimum, normalise_grade
 from harte.harte_utils import harte_to_pitch
 
 TONAL_VECTOR = [0, 7, 5, 1, 1, 2, 3, 1, 2, 2, 4, 6]
@@ -33,7 +33,8 @@ def calculate_weights(root: int, grades: list, consonance_vector=None) -> list:
     """
     if consonance_vector is None:
         consonance_vector = TONAL_VECTOR
-    grades = [g if g <= 11 else g - 12 for g in grades]
+    grades = [normalise_grade(g) for g in grades]
+    root = normalise_grade(root)
     return [consonance_vector[(x - root if x >= root else 12 + x - root)] for x in grades]
 
 
@@ -89,9 +90,17 @@ def reorganise_path(gct_path: list) -> list:
     i.e. [root, [grades]]
     """
     root = gct_path[0]
-    reorganised_grades = sorted((x - root if x - root >= 0 else 12 + x - root) for x in gct_path)
+    reorganised_grades = [(x - root if x - root >= 0 else 12 + x - root) for x in gct_path]
+    # prettify grades
+    grades = []
+    previous = 0
+    for grade in reorganised_grades:
+        if grade < previous:
+            grade += 12
+        previous = grade
+        grades.append(grade)
 
-    return [root + reorganised_grades[0], reorganised_grades]
+    return [normalise_grade(root + grades[0]), grades]
 
 
 def choose_path_alternatives(path_alternatives: list[list], original_chord: list) -> list:
@@ -102,7 +111,6 @@ def choose_path_alternatives(path_alternatives: list[list], original_chord: list
     :return:
     """
     assert len(path_alternatives) > 0, 'GCT produced no results.'
-    print(len(path_alternatives))
     if len(path_alternatives) == 1:
         return path_alternatives[0]
     best_alternative = [x for x in path_alternatives if path_alternatives[0] == original_chord[0]]
@@ -127,5 +135,5 @@ if __name__ == "__main__":
     # ex = get_minimum_path([4, 7, 11], TONAL_VECTOR)
     # print(ex)
     # print(reorganise_path(ex[0]))
-    test = harte_to_gct('C:sus4')
+    test = harte_to_gct('D:maj9')
     print(test)

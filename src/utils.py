@@ -36,3 +36,9 @@ def open_stats_file(stats_file_path: str):
         # skip header
         next(stats)
         return [x for x in stats]
+
+
+def normalise_grade(grade: int) -> int:
+    while grade > 12:
+        grade -= 12
+    return grade
