@@ -2,7 +2,7 @@
 Utility functions for managing and transforming Harte chords.
 """
 
-from music21 import note, interval
+from music21 import note, interval, pitch
 
 from harte_map import HARTE_SHORTHAND_MAP
 
@@ -40,11 +40,26 @@ def convert_interval(chord_interval: str) -> str:
             return chord_interval.replace('b', 'd').replace('#', 'A')
         return f'P{chord_interval}'
     if 'b' in chord_interval or '#' in chord_interval:
-        return chord_interval.replace('b', 'm').replace('#', 'A')
+        return chord_interval.replace('bb', 'd').replace('b', 'm').replace('#', 'A')
     return f'M{chord_interval}'
 
 
-def harte_to_pitch(harte_chord: str) -> tuple:
+def clean_asterisks(chord_grades: list) -> list:
+    """
+
+    :param chord_grades:
+    :return:
+    """
+    ask_list = [i for i, x in enumerate(chord_grades) if '*' in x]
+    if len(ask_list) > 0:
+        removed_grades = [chord_grades.pop(k) for k in ask_list]
+        for grade in removed_grades:
+            grade_to_remove = ''.join([el for el in grade if el.isdigit()])
+            chord_grades.remove(grade_to_remove)
+    return chord_grades
+
+
+def harte_to_pitch(harte_chord: str) -> list:
     """
 
     :param harte_chord: a chord annotated according to the Harte Notation
@@ -58,18 +73,22 @@ def harte_to_pitch(harte_chord: str) -> tuple:
     root_pitch = root_object.pitch.pitchClass
     # check the first character of harte_grades
     # if grades contains shorthands extend the chord
-    harte_grades = harte_grades.lstrip('(').rstrip(')')
+    harte_grades = harte_grades.rstrip(')')
+
     if harte_grades[0] != '(':
         harte_grades = extend_harte(harte_grades)
     else:
-        harte_grades = harte_grades.split(',')
-    harte_grades = [interval.Interval(convert_interval(x)).chromatic.mod12 for x in harte_grades]
+        harte_grades = harte_grades.lstrip('(').split(',')
+    # handle asterisks
+    harte_grades = clean_asterisks(harte_grades)
+    harte_grades = [interval.Interval(convert_interval(x)).chromatic.undirected for x in harte_grades]
     if '*1' not in harte_chord:
         harte_grades.append(0)
-    return root_pitch, sorted(harte_grades)
+    converted_chord = [root_pitch + x for x in harte_grades]
+    return sorted(converted_chord)
 
 
 if __name__ == '__main__':
     # test Harte utils
-    print(harte_to_pitch('Fb:maj(6,7)'))
-    print(harte_to_pitch('C#:maj(3,5,b7)'))
+    print(harte_to_pitch('C:maj9'))
+    print(harte_to_pitch('C#:(3,5,b7)'))

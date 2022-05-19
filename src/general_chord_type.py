@@ -2,8 +2,14 @@
 Re-implementation of the General Chord Type in an Object-Oriented fashion.
 """
 import sys
+import os
+
+sys.path.append(os.path.dirname(os.getcwd()))
+harte_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'harte'))
+sys.path.append(harte_path)
 
 from utils import get_minimum
+from harte.harte_utils import harte_to_pitch
 
 TONAL_VECTOR = [0, 7, 5, 1, 1, 2, 3, 1, 2, 2, 4, 6]
 ATONAL_VECTOR = [0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2]
@@ -27,6 +33,7 @@ def calculate_weights(root: int, grades: list, consonance_vector=None) -> list:
     """
     if consonance_vector is None:
         consonance_vector = TONAL_VECTOR
+    grades = [g if g <= 11 else g - 12 for g in grades]
     return [consonance_vector[(x - root if x >= root else 12 + x - root)] for x in grades]
 
 
@@ -82,19 +89,41 @@ def reorganise_path(gct_path: list) -> list:
     i.e. [root, [grades]]
     """
     root = gct_path[0]
-    reorganised_grades = [(x - root if x >= root else 12 + x - root) for x in gct_path]
-    return [root, reorganised_grades]
+    reorganised_grades = sorted((x - root if x - root >= 0 else 24 + x - root) for x in gct_path)
+
+    return [root + reorganised_grades[0], reorganised_grades]
 
 
-def main():
+def choose_path_alternatives(path_alternatives: list[list], original_chord: list) -> list:
     """
 
+    :param path_alternatives:
+    :param original_chord:
     :return:
     """
-    pass
+    assert len(path_alternatives) > 0, 'GCT produced no results.'
+    if len(path_alternatives) == 1:
+        return path_alternatives[0]
+    best_alternative = [x for x in path_alternatives if path_alternatives[0] == original_chord[0]]
+    return best_alternative[0] if len(best_alternative) > 0 else path_alternatives[0]
+
+
+def harte_to_gct(harte_chord: str) -> list:
+    """
+    Main function that converts a Harte chord into a pitch-class set, and
+    performs the New-GCT algorithm on it
+    :return:
+    """
+    chord = harte_to_pitch(harte_chord)
+    minimum_path = get_minimum_path(chord, TONAL_VECTOR)
+    minimum_path = choose_path_alternatives(minimum_path, chord)
+
+    return reorganise_path(minimum_path)
 
 
 if __name__ == "__main__":
-    ex = get_minimum_path([0, 4, 7], TONAL_VECTOR)
-    print(ex)
-    print(reorganise_path(ex[0]))
+    # ex = get_minimum_path([4, 7, 11], TONAL_VECTOR)
+    # print(ex)
+    # print(reorganise_path(ex[0]))
+    test = harte_to_gct('G:hdim7')
+    print(test)
