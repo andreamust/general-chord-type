@@ -2,7 +2,7 @@
 Utility functions for managing and transforming Harte chords.
 """
 
-from music21 import note, interval, pitch
+from music21 import note, interval
 
 from harte_map import HARTE_SHORTHAND_MAP
 
@@ -68,6 +68,7 @@ def harte_to_pitch(harte_chord: str) -> list:
     bass = []
     if '/' in harte_chord:
         harte_chord, bass = harte_chord.split('/')
+        bass = [interval.Interval(convert_interval(bass)).chromatic.undirected]
     harte_split = harte_chord.split(':')
     assert len(harte_split) == 2, 'The given chord is not a valid Harte chord.'
     harte_root, harte_grades = harte_split
@@ -81,17 +82,17 @@ def harte_to_pitch(harte_chord: str) -> list:
         harte_grades = extend_harte(harte_grades)
     else:
         harte_grades = harte_grades.lstrip('(').split(',')
-    harte_grades.extend(bass)
     # handle asterisks
     harte_grades = clean_asterisks(harte_grades)
     harte_grades = [interval.Interval(convert_interval(x)).chromatic.undirected for x in harte_grades]
     if '*1' not in harte_chord:
         harte_grades.append(0)
+    harte_grades.extend(bass)
     converted_chord = [root_pitch + x for x in harte_grades]
     return sorted(set(converted_chord))
 
 
 if __name__ == '__main__':
     # test Harte utils
-    print(harte_to_pitch('C:maj9/5'))
+    print(harte_to_pitch('C:maj(6)/b6'))
     print(harte_to_pitch('C#:(3,5,b7)'))

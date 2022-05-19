@@ -115,6 +115,7 @@ def harte_to_gct(harte_chord: str) -> list:
     performs the New-GCT algorithm on it
     :return:
     """
+    harte_chord = harte_chord.replace(' ', '')
     chord = harte_to_pitch(harte_chord)
     minimum_path = get_minimum_path(chord, TONAL_VECTOR)
     minimum_path = choose_path_alternatives(minimum_path, chord)
