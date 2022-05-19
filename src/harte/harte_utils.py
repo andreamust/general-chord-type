@@ -23,7 +23,7 @@ def extend_harte(harte_grades: str) -> list:
         return extended_shorthand
     # if shorthand and grades
     cleaned_grades = split_grades[1].split(',')
-    return sorted(set(extended_shorthand + cleaned_grades), key=lambda x: x[-1])
+    return list(set(extended_shorthand + cleaned_grades))
 
 
 def convert_interval(chord_interval: str) -> str:
@@ -65,6 +65,9 @@ def harte_to_pitch(harte_chord: str) -> list:
     :param harte_chord: a chord annotated according to the Harte Notation
     :return: list: a list of pitches that compose the chord
     """
+    bass = []
+    if '/' in harte_chord:
+        harte_chord, bass = harte_chord.split('/')
     harte_split = harte_chord.split(':')
     assert len(harte_split) == 2, 'The given chord is not a valid Harte chord.'
     harte_root, harte_grades = harte_split
@@ -74,21 +77,21 @@ def harte_to_pitch(harte_chord: str) -> list:
     # check the first character of harte_grades
     # if grades contains shorthands extend the chord
     harte_grades = harte_grades.rstrip(')')
-
     if harte_grades[0] != '(':
         harte_grades = extend_harte(harte_grades)
     else:
         harte_grades = harte_grades.lstrip('(').split(',')
+    harte_grades.extend(bass)
     # handle asterisks
     harte_grades = clean_asterisks(harte_grades)
     harte_grades = [interval.Interval(convert_interval(x)).chromatic.undirected for x in harte_grades]
     if '*1' not in harte_chord:
         harte_grades.append(0)
     converted_chord = [root_pitch + x for x in harte_grades]
-    return sorted(converted_chord)
+    return sorted(set(converted_chord))
 
 
 if __name__ == '__main__':
     # test Harte utils
-    print(harte_to_pitch('C:maj9'))
+    print(harte_to_pitch('C:maj9/5'))
     print(harte_to_pitch('C#:(3,5,b7)'))

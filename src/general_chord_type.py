@@ -89,7 +89,7 @@ def reorganise_path(gct_path: list) -> list:
     i.e. [root, [grades]]
     """
     root = gct_path[0]
-    reorganised_grades = sorted((x - root if x - root >= 0 else 24 + x - root) for x in gct_path)
+    reorganised_grades = sorted((x - root if x - root >= 0 else 12 + x - root) for x in gct_path)
 
     return [root + reorganised_grades[0], reorganised_grades]
 
@@ -102,6 +102,7 @@ def choose_path_alternatives(path_alternatives: list[list], original_chord: list
     :return:
     """
     assert len(path_alternatives) > 0, 'GCT produced no results.'
+    print(len(path_alternatives))
     if len(path_alternatives) == 1:
         return path_alternatives[0]
     best_alternative = [x for x in path_alternatives if path_alternatives[0] == original_chord[0]]
@@ -125,5 +126,5 @@ if __name__ == "__main__":
     # ex = get_minimum_path([4, 7, 11], TONAL_VECTOR)
     # print(ex)
     # print(reorganise_path(ex[0]))
-    test = harte_to_gct('G:hdim7')
+    test = harte_to_gct('C:sus4')
     print(test)
