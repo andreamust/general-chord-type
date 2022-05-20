@@ -64,7 +64,7 @@ def harte_to_pitch(harte_chord: str) -> list:
     """
 
     :param harte_chord: a chord annotated according to the Harte Notation
-    :return: list: a list of pitches that compose the chord
+    :return: list: a list of pitches that compose the chord in the pc-set notation
     """
     bass = []
     if '/' in harte_chord:
