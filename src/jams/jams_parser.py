@@ -22,7 +22,7 @@ def parse_jams(jams_path: str) -> tuple:
     return [observation.value for observation in key], [observation.value for observation in observations]
 
 
-def convert_jams(jams_chords: list, jams_key: str):
+def convert_jams(jams_chords: list, jams_key: str) -> list:
     """
 
     :param jams_chords:
