@@ -22,15 +22,15 @@ def parse_jams(jams_path: str) -> tuple:
     return [observation.value for observation in key], [observation.value for observation in observations]
 
 
-def convert_jams(jams_chords: list, jams_key: int):
+def convert_jams(jams_chords: list, jams_key: str):
     """
 
     :param jams_chords:
+    :param jams_key:
     :return:
     """
-
     converted_chords = [harte_to_gct(chord) for chord in jams_chords]
-    return [[transposer(root), grades] for root, grades in converted_chords]
+    return [[transposer(jams_key, root, target_root=0), grades] for root, grades in converted_chords]
 
 
 if __name__ == '__main__':
