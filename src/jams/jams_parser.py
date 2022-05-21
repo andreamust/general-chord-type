@@ -22,6 +22,18 @@ def parse_jams(jams_path: str) -> tuple:
     return [observation.value for observation in key], [observation.value for observation in observations]
 
 
+def get_jams_meta(jams_path: str):
+    """
+
+    :param jams_path:
+    :return:
+    """
+    jams_file = jams.load(jams_path, validate=False, strict=False)
+
+    metadata = jams_file.file_metadata.title
+    return metadata
+
+
 def convert_jams(jams_chords: list, jams_key: str) -> list:
     """
 
@@ -35,6 +47,5 @@ def convert_jams(jams_chords: list, jams_key: str) -> list:
 
 if __name__ == '__main__':
     keys, chords = parse_jams('../../test/test_data/biab-internet-corpus_12.jams')
-    print(keys)
-    print(chords)
     print(convert_jams(chords, keys[0]))
+    print(get_jams_meta('../../test/test_data/biab-internet-corpus_12.jams'))

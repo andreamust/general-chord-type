@@ -76,7 +76,6 @@ def store_simplifications(chords_list: list) -> list:
 
 def simplify_chord(gct_chord: tuple, chord_simplifications: str = SIMPLIFICATIONS) -> tuple:
     simplified = joblib.load(chord_simplifications)
-    print(simplified)
     for simplified_class in simplified:
         if gct_chord in simplified_class:
             minimum = sys.maxsize
